@@ -113,6 +113,7 @@ function takeshot(message, sender, sendResponse) {
     let h = video.offsetHeight;
     let x = video.getBoundingClientRect().left;
     let y = video.getBoundingClientRect().top;
+
     drawingContext.fillRect(x, y, w, h);
     drawingContext.drawImage(video, x, y, w, h);
   }
