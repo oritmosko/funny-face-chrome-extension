@@ -101,29 +101,49 @@ function takeshot(message, sender, sendResponse) {
   // Use the html2canvas  to take a screenshot of the body.
 
   // Scale and offset issues of the taken screenshot were solved using
-  // https://developpaper.com/solution-to-incomplete-image-offset-generated-by-html2canvas/
+  // https://dev.to/protium/javascript-rendering-videos-with-html2canvas-3bk
   let body = document.querySelector("body");
-  html2canvas(body, {
-        Logging: false, // log switch to view the internal execution process of html2canvas
-        width:  body.clientWidth , // DOM original width
-        height: body.clientHeight, // DOM original height
-        scrollY: 0,
-        scrollX: 0,
-        Usecors: true // [important] enable cross domain configuration
-    }).then((canvas) => {
-      const canvasImageUrl = canvas.toDataURL();
-      // Load image from url
-      loadImage(canvasImageUrl, (canvasImage) => {
-        canvasImage.resize(body.clientWidth, body.clientHeight);
-        // image(canvasImage, 0, 0); // For debugging
-        faceRecognizer.detect(canvasImage, (err, results) => {
-          detections = results;
 
-          // Continue running and classifying faces
-          if (runFunnyFace) {
-            setTimeout(takeshot, 100);
-          }
-        });
+  // Capture videos hack by https://dev.to/protium/javascript-rendering-videos-with-html2canvas-3bk
+  let videos = document.querySelectorAll('video');
+  for (v of videos) {
+    try {
+      let w = v.offsetWidth
+      let h = v.offsetHeight
+
+      let tmpCanvas = createCanvas(w, h); // declare a canvas element in your html
+      drawingContext.fillRect(0, 0, w, h);
+      drawingContext.drawImage(v, 0, 0, w, h);
+      v.height = v.getBoundingClientRect().top;
+      v.style.backgroundImage = `url(${tmpCanvas.toDataURL()})` // here is the magic
+      v.style.backgroundSize = 'cover'
+      drawingContext.clearRect(0, 0, w, h); // clean the canvas
+    } catch (e) {
+      continue;
+    }
+  }
+
+  html2canvas(body, {
+      Logging: false, // log switch to view the internal execution process of html2canvas
+      width:  body.clientWidth , // DOM original width
+      height: body.clientHeight, // DOM original height
+      scrollY: 0,
+      scrollX: 0,
+      Usecors: true // [important] enable cross domain configuration
+  }).then((canvas) => {
+    const canvasImageUrl = canvas.toDataURL();
+    // Load image from url
+    loadImage(canvasImageUrl, (canvasImage) => {
+      canvasImage.resize(body.clientWidth, body.clientHeight);
+      // image(canvasImage, 0, 0); // For debugging
+      faceRecognizer.detect(canvasImage, (err, results) => {
+        detections = results;
+
+        // Continue running and classifying faces
+        if (runFunnyFace) {
+          setTimeout(takeshot, 100);
+        }
       });
     });
+  });
 }
