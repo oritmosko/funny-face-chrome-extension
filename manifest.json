@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Funny Face",
-  "description": "Overlay faces in webpage with cartoon parts using p5 and faceApi.",
+  "description": "Overlay faces in meeting videos with cartoon parts using p5 and faceApi.",
   "version": "1.0",
   "web_accessible_resources": [{
     "resources": ["assets/*"],
@@ -9,8 +9,7 @@
   }],
   "content_scripts": [
     {
-      "matches": ["http://*/*"],
-      "matches": ["https://*/*"],
+      "matches": ["*://meet.google.com/*"],
       "js": ["libraries/p5.js",
              "libraries/p5.dom-min.js",
              "libraries/html2canvas.min.js",
